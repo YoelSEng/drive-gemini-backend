@@ -1,0 +1,11 @@
+# Ignore Node.js dependency folder
+node_modules
+
+# Ignore environment variables file
+.env
+
+# Ignore Google credentials file
+credentials.json
+
+# Ignore build output folder
+dist
