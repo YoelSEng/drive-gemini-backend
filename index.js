@@ -9,34 +9,39 @@ const pdf = require('pdf-parse');
 const pptx2json = require('pptx2json');
 require('dotenv').config();
 
+
+
+// This tells the Google library how to authenticate.
+// --- Section 2: Initializing the Server and APIs ---
 // --- Section 2: Initializing the Server and APIs ---
 const app = express();
 app.use(express.json());
 
-// This tells the Google library how to authenticate.
+// Check if credentials are in an environment variable (for Render) or a local file
+const credentials = process.env.GOOGLE_CREDENTIALS_JSON
+    ? JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON) // If on Render, parse the variable
+    : require('./credentials.json');                   // If local, require the file
+
+// Create a single authentication object for all Google services
 const auth = new google.auth.GoogleAuth({
-    keyFile: 'credentials.json',
+    credentials, // Use the credentials object (either from variable or file)
     scopes: [
         'https://www.googleapis.com/auth/drive.readonly',
         'https://www.googleapis.com/auth/cloud-platform'
     ],
 });
 
-// Creates a 'drive' object that we can use to make calls to the Google Drive API.
+// Use the auth object for Google Drive
 const drive = google.drive({ version: 'v3', auth });
 
-// This now explicitly uses the keyFile for auth.
+// Use the SAME auth object for Vertex AI
 const vertexAI = new VertexAI({
-    project: 'drive-gemini-site', // Make sure this is your correct Project ID
+    project: 'drive-gemini-site', // Your project ID
     location: 'us-central1',
-    googleAuthOptions: { keyFile: 'credentials.json' } // This line solves the auth error
+    googleAuthOptions: { authClient: auth }
 });
 
-// ==========================================================
-// FINAL FIX: Using the latest Gemini 2.5 Flash model.
-// ==========================================================
-const generativeModel = vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
+const generativeModel = vertexAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' }); // Or your preferred model
 
 // --- Section 3: Creating our API Endpoints (The "Kitchen Orders") ---
 
