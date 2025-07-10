@@ -2,6 +2,7 @@
 
 // --- Section 1: Importing our tools ---
 const express = require('express');
+const cors = require('cors'); 
 const { google } = require('googleapis');
 const { VertexAI } = require('@google-cloud/vertexai');
 const mammoth = require("mammoth");
@@ -15,6 +16,7 @@ require('dotenv').config();
 // --- Section 2: Initializing the Server and APIs ---
 // --- Section 2: Initializing the Server and APIs ---
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Check if credentials are in an environment variable (for Render) or a local file
